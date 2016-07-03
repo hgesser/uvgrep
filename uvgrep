@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# uvgrep (UniVersal Grep), version 1.0 (2016/07/03)
+# (c) Hans-Georg Esser, EasyLinux, hgesser@easylinux.de
+# uvgrep: grep txt, PDF and LibreOffice files
+# Licensed under the GPL, version 3 (see LICENSE)
+
+unset OPT_IGNORE
+unset OPT_NUMBER
+OPTERR=0
+OPTIONS=""
+ODTOPTIONS=""
+while getopts ":in" option; do
+  case $option in
+    "?")
+      echo $0: Ungueltige Option "-$OPTARG"
+      exit 1;;
+    "i")
+      OPTIONS+=i
+      ODTOPTIONS+=i
+      OPT_IGNORE=1;;
+    "n")
+      OPTIONS+=n
+      OPT_NUMBER=1;;
+  esac
+done
+if [ "$OPTIONS" != "" ]; then OPTIONS="-$OPTIONS"; fi
+if [ "$ODTOPTIONS" != "" ]; then ODTOPTIONS="-$ODTOPTIONS"; fi
+shift $((OPTIND-1))
+
+PATTERN=$1
+shift
+
+for file in $@; do
+  ext="${file##*.}"
+  filetype=$(echo $ext | tr 'A-Z' 'a-z')
+  case $filetype in
+    txt | sh | conf | pl | py)
+      if [ -f $file ]; then
+        grep -H --color $OPTIONS $PATTERN $file
+      else
+        echo $0: $file: Datei nicht gefunden >&2
+      fi;;
+    pdf)
+      if [ -f $file ]; then
+        pdfgrep -H $OPTIONS $PATTERN $file
+      else
+        echo $0: $file: Datei nicht gefunden >&2
+      fi;;
+    odt | ods | odp)
+      unzip -caq $file content.xml | xmllint --format - \
+        | sed -e 's/ *//' \
+        | grep $ODTOPTIONS -H --color $PATTERN | \
+	sed -e "s|^(standard input)|$file|" ;;
+    *)
+      echo $0: $file: Kann keine Dateien mit \
+        Endung "\".$filetype\"" verarbeiten >&2;;
+  esac
+done
+
