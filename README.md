@@ -4,7 +4,7 @@ UniVersal Grep (uvgrep)
 The `uvgrep` tool lets you grep text, PDF and LibreOffice/OpenOffice (ODF) files simultaneously. It requires that `bash` (for `getopts`), `grep`, `pdfgrep`, `sed`, `xmllint`, and `unzip` (for unpacking *odt*, *odp* and *ods* files) are installed.
 
 ## Installation
-Get the file `uvgrep` and move it to a folder which is in the `PATH` variable, e. g. `/usr/local/bin`. Check that the required tools (see above) are installed.
+Get the file `uvgrep`, make sure it is executable (`chmod a+x uvgrep`), and move it to a folder which is in the `PATH` variable, e. g. `/usr/local/bin`. Check that the required tools (see above) are installed.
 
 ## Usage
 `uvgrep [options] [files]`
