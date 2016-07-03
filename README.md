@@ -21,6 +21,15 @@ The current and initial version of `uvgrep` relies solely on filename extensions
 
 `uvgrep` uses German error messages for the two problems that can occur (file not found, unsupported file type).
 
+#### Example
+
+```
+[esser@quad:~]$ uvgrep -in libreoffice *.sh *.pdf *.odt
+uvgrep.sh:5:# uvgrep: grep txt, PDF and LibreOffice files
+uvgrep.pdf:1:   5 # uvgrep: grep txt, PDF and LibreOffice files
+test.odt:<text:p text:style-name="Standard">Das ist ein kleiner Test-Text, in dem das Wort "LibreOffice" vorkommt.</text:p>
+```
+
 ## Name Choice
 `uvgrep` was meant to be named "ugrep" (universal grep), but a different project already uses that name, so I picked "uvgrep".
 
