@@ -19,6 +19,8 @@ The current and initial version of `uvgrep` relies solely on filename extensions
 
 `uvgrep` cannot detect on which pages of an ODF document a search term was found.
 
+`uvgrep` uses German error messages for the two problems that can occur (file not found, unsupported file type).
+
 ## Name Choice
 `uvgrep` was meant to be named "ugrep" (universal grep), but a different project already uses that name, so I picked "uvgrep".
 
