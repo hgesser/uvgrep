@@ -24,7 +24,7 @@ The current and initial version of `uvgrep` relies solely on filename extensions
 #### Example
 
 ```
-[esser@quad:~]$ uvgrep -in libreoffice *.sh *.pdf *.odt
+[esser@quad:~]$ uvgrep -in libreoffice *.sh *.pdf *.odt *.???x
 uvgrep.sh:5:# uvgrep: grep txt, PDF and LibreOffice files
 uvgrep.pdf:1:   5 # uvgrep: grep txt, PDF and LibreOffice files
 test.odt:<text:p text:style-name="Standard">This test file contains the word "LibreOffice".</text:p>
