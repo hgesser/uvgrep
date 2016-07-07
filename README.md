@@ -28,6 +28,7 @@ The current and initial version of `uvgrep` relies solely on filename extensions
 uvgrep.sh:5:# uvgrep: grep txt, PDF and LibreOffice files
 uvgrep.pdf:1:   5 # uvgrep: grep txt, PDF and LibreOffice files
 test.odt:<text:p text:style-name="Standard">This test file contains the word "LibreOffice".</text:p>
+test2.pptx[/slide9.xml]:<a:t>This is not a LibreOffice but a Microsoft Office file.</a:t>
 ```
 
 ## Name Choice
