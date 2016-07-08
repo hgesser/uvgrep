@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# uvgrep (UniVersal Grep), version 1.1 (2016/07/03)
+# uvgrep (UniVersal Grep), version 1.0.1 (2016/07/08)
 # (c) Hans-Georg Esser, EasyLinux, hgesser@easylinux.de
 # uvgrep: grep txt, PDF and LibreOffice files
 # Licensed under the GPL, version 3 (see LICENSE)
@@ -12,6 +12,7 @@ MSG_BADOPTION="$0: Ungueltige Option '%s'\n"
 unset OPT_IGNORE
 unset OPT_NUMBER
 OPTERR=0
+IFS=""
 OPTIONS=""
 ODTOPTIONS=""
 XMLLINT_INDENT=""
@@ -37,7 +38,7 @@ PATTERN=$1
 shift
 
 for file in $@; do
-  if [ ! -f $file ]; then
+  if [ ! -f "$file" ]; then
     printf "$MSG_NOTFOUND" "$file" >&2
     continue
   fi
@@ -46,22 +47,22 @@ for file in $@; do
   filetype=$(echo $ext | tr 'A-Z' 'a-z')
   case $filetype in
     txt | sh | conf | pl | py)
-      grep -H --color $OPTIONS $PATTERN $file ;;
+      grep -H --color $OPTIONS $PATTERN "$file" ;;
       
     pdf)
-      pdfgrep -H $OPTIONS $PATTERN $file ;;
+      pdfgrep -H $OPTIONS $PATTERN "$file" ;;
       
     odt | ods | odp)
-      unzip -caq $file content.xml | xmllint --format - | sed -e 's/ *//' \
+      unzip -caq "$file" content.xml | xmllint --format - | sed -e 's/ *//' \
         | grep $ODTOPTIONS -H --color=always $PATTERN | sed -e "s|^(standard input)|$file|" ;;
 
     docx)
-      unzip -caq $file word/document.xml | xmllint --format - | sed -e 's/ *//' \
+      unzip -caq "$file" word/document.xml | xmllint --format - | sed -e 's/ *//' \
         | grep $ODTOPTIONS -H --color=always $PATTERN | sed -e "s|^(standard input)|$file|" ;;
 
     xlsx)
       dir=$(tempfile -p uvgrep-); rm $dir; mkdir $dir
-      unzip -ajq -d $dir $file xl/worksheets/sheet*.xml xl/sharedStrings.xml
+      unzip -ajq -d $dir "$file" xl/worksheets/sheet*.xml xl/sharedStrings.xml
       pushd $dir > /dev/null
       for subfile in *.xml; do
         xmllint --recover --format "$subfile" | sed -e 's/ *//' \
@@ -72,7 +73,7 @@ for file in $@; do
 
     pptx)
       dir=$(tempfile -p uvgrep-); rm $dir; mkdir $dir
-      unzip -ajq -d $dir $file ppt/slides/slide*.xml
+      unzip -ajq -d $dir "$file" ppt/slides/slide*.xml
       pushd $dir > /dev/null
       for subfile in *.xml; do
         xmllint --recover --format "$subfile" | sed -e 's/ *//' \
@@ -85,4 +86,3 @@ for file in $@; do
       printf "$MSG_BADFILETYPE" "$file" "$filetype" >&2 ;;
   esac
 done
-
