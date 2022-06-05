@@ -1,0 +1,12 @@
+v1.0.2 (2022-06-05)
+  - add -x option that removes XML tags from output lines
+  - use mktemp instead of tempfile, that is more portable
+  - switch grep option -H (always with filename) to -h
+    (no filename), because some versions of grep have started
+    to color-highlight the filename
+  - added .md extension to text files
+  - added English error messages (displayed if LANG is not set
+    or if it is set but does not start with "de")
+
+v1.0.1 (2016-07-03)
+  - initial release
