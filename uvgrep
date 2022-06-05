@@ -1,22 +1,29 @@
 #!/bin/bash
 
-# uvgrep (UniVersal Grep), version 1.0.1 (2016/07/08)
-# (c) Hans-Georg Esser, EasyLinux, hgesser@easylinux.de
+# uvgrep (UniVersal Grep), version 1.0.2 (2022/06/05)
+# (c) Hans-Georg Esser, FH Suedwestfalen, esser.hans-georg@fh-swf.de
 # uvgrep: grep txt, PDF and LibreOffice files
 # Licensed under the GPL, version 3 (see LICENSE)
 
-MSG_NOTFOUND="$0: %s: Datei nicht gefunden\n"
-MSG_BADFILETYPE="$0: %s: Kann keine Dateien mit Endung '.%s' verarbeiten\n"
-MSG_BADOPTION="$0: Ungueltige Option '%s'\n"
+if [ -n "$LANG" ] && [ ${LANG:0:2} == "de" ]; then
+  MSG_NOTFOUND="$0: %s: Datei nicht gefunden\n"
+  MSG_BADFILETYPE="$0: %s: Kann keine Dateien mit Endung '.%s' verarbeiten\n"
+  MSG_BADOPTION="$0: Ungueltige Option '%s'\n"
+else
+  MSG_NOTFOUND="$0: %s: File not found\n"
+  MSG_BADFILETYPE="$0: %s: Cannot handle '.%s' filetype\n"
+  MSG_BADOPTION="$0: Invalid option '%s'\n"
+fi
 
 unset OPT_IGNORE
 unset OPT_NUMBER
+unset OPT_REMOVE_XML
 OPTERR=0
 IFS=""
 OPTIONS=""
 ODTOPTIONS=""
 XMLLINT_INDENT=""
-while getopts ":in" option; do
+while getopts ":inx" option; do
   case $option in
     "?")
       printf "$MSG_BADOPTION" "-$OPTARG"
@@ -28,11 +35,23 @@ while getopts ":in" option; do
     "n")
       OPTIONS+=n
       OPT_NUMBER=1;;
+    "x")
+      OPT_REMOVE_XML=1;;
   esac
 done
 if [ "$OPTIONS" != "" ]; then OPTIONS="-$OPTIONS"; fi
 if [ "$ODTOPTIONS" != "" ]; then ODTOPTIONS="-$ODTOPTIONS"; fi
 shift $((OPTIND-1))
+
+# remove_xml: deletes opening and closing XML tags around text
+# if OPT_REMOVE_XML is set. Otherwise does nothing (cat)
+remove_xml() {
+  if [ -z "$OPT_REMOVE_XML" ]; then
+    cat
+  else
+    sed -e 's:<[^>]*>::g' -e 's/^ *//'	
+  fi
+}
 
 PATTERN=$1
 shift
@@ -46,7 +65,7 @@ for file in $@; do
   ext="${file##*.}"
   filetype=$(echo $ext | tr 'A-Z' 'a-z')
   case $filetype in
-    txt | sh | conf | pl | py)
+    txt | sh | conf | pl | py | md)
       grep -H --color $OPTIONS $PATTERN "$file" ;;
       
     pdf)
@@ -54,30 +73,34 @@ for file in $@; do
       
     odt | ods | odp)
       unzip -caq "$file" content.xml | xmllint --format - | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -H --color=always $PATTERN | sed -e "s|^(standard input)|$file|" ;;
+        | grep $ODTOPTIONS -h --color=always $PATTERN \
+        | sed -e "s|^|$file:|" | remove_xml ;;
 
     docx)
       unzip -caq "$file" word/document.xml | xmllint --format - | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -H --color=always $PATTERN | sed -e "s|^(standard input)|$file|" ;;
+        | grep $ODTOPTIONS -h --color=always $PATTERN \
+        | sed -e "s|^|$file:|" | remove_xml ;;
 
     xlsx)
-      dir=$(tempfile -p uvgrep-); rm $dir; mkdir $dir
+      dir=$(mktemp); rm $dir; mkdir $dir
       unzip -ajq -d $dir "$file" xl/worksheets/sheet*.xml xl/sharedStrings.xml
       pushd $dir > /dev/null
       for subfile in *.xml; do
         xmllint --recover --format "$subfile" | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -H --color=always $PATTERN | sed -e "s|^(standard input)|$file[/$subfile]|"
+        | grep $ODTOPTIONS -h --color=always $PATTERN \
+        | sed -e "s|^|$file[/$subfile]:|" | remove_xml
       done
       popd > /dev/null
       rm -rf $dir ;;
 
     pptx)
-      dir=$(tempfile -p uvgrep-); rm $dir; mkdir $dir
+      dir=$(mktemp); rm $dir; mkdir $dir
       unzip -ajq -d $dir "$file" ppt/slides/slide*.xml
       pushd $dir > /dev/null
       for subfile in *.xml; do
         xmllint --recover --format "$subfile" | sed -e 's/ *//' \
-        | grep $ODTOPTIONS -H --color=always $PATTERN | sed -e "s|^(standard input)|$file[/$subfile]|"
+        | grep $ODTOPTIONS -h --color=always $PATTERN \
+        | sed -e "s|^|$file[/$subfile]:|" | remove_xml
       done
       popd > /dev/null
       rm -rf $dir ;;
