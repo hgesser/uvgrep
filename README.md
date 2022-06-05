@@ -1,7 +1,7 @@
 # uvgrep
 UniVersal Grep (uvgrep)
 
-The `uvgrep` tool lets you grep text, PDF, Microsoft Office (*docx*, *xlsx*, *pptx*) and LibreOffice/OpenOffice (ODF) files simultaneously. It requires that `bash` (for `getopts`), `grep`, `pdfgrep`, `sed`, `xmllint`, and `unzip` (for unpacking *docx*, *xlsx*, *pptx*, *odt*, *odp* and *ods* files) are installed.
+The `uvgrep` tool lets you grep text, PDF, Microsoft Office (*docx*, *xlsx*, *pptx*) and LibreOffice/OpenOffice (ODF) files simultaneously. It requires that `bash` (for `getopts`), `grep`, `pdfgrep`, `sed`, `mktemp`, `xmllint`, and `unzip` (for unpacking *docx*, *xlsx*, *pptx*, *odt*, *odp* and *ods* files) are installed.
 
 ## Installation
 Get the file `uvgrep`, make sure it is executable (`chmod a+x uvgrep`), and move it to a folder which is in the `PATH` variable, e. g. `/usr/local/bin`. Check that the required tools (see above) are installed.
@@ -13,6 +13,8 @@ Get the file `uvgrep`, make sure it is executable (`chmod a+x uvgrep`), and move
 `-i`: ignore case
 
 `-n`: output line numbers (text) or page numbers (PDF)
+
+`-x`: remove XML tags from output lines
 
 #### Limitations
 The current and initial version of `uvgrep` relies solely on filename extensions and should be modified to use the output of the `file` program. 
@@ -29,6 +31,11 @@ uvgrep.sh:5:# uvgrep: grep txt, PDF and LibreOffice files
 uvgrep.pdf:1:   5 # uvgrep: grep txt, PDF and LibreOffice files
 test.odt:<text:p text:style-name="Standard">This test file contains the word "LibreOffice".</text:p>
 test2.pptx[/slide9.xml]:<a:t>This is not a LibreOffice but a Microsoft Office file.</a:t>
+[esser@quad:~]$ uvgrep -inx libreoffice *.sh *.pdf *.odt *.???x
+uvgrep.sh:5:# uvgrep: grep txt, PDF and LibreOffice files
+uvgrep.pdf:1:   5 # uvgrep: grep txt, PDF and LibreOffice files
+test.odt:This test file contains the word "LibreOffice".
+test2.pptx[/slide9.xml]:This is not a LibreOffice but a Microsoft Office file.
 ```
 
 ## Name Choice
