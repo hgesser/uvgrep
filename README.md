@@ -42,4 +42,4 @@ test2.pptx[/slide9.xml]:This is not a LibreOffice but a Microsoft Office file.
 `uvgrep` was meant to be named "ugrep" (universal grep), but a different project already uses that name, so I picked "uvgrep".
 
 ## Author and Copyright
-Copyright (c) 2016 Hans-Georg Eßer, licensed under the GPL version 3.
+Copyright (c) 2016-2022 Hans-Georg Eßer, licensed under the GPL version 3.
