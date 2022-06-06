@@ -21,7 +21,7 @@ The current and initial version of `uvgrep` relies solely on filename extensions
 
 `uvgrep` cannot detect on which pages, tables or slides, of a LibreOffice document a search term was found; it cannot detect on which pages of a Microsoft Word document it was found. (However it will display information about slides or tables in Microsoft documents.)
 
-`uvgrep` uses German error messages for the two problems that can occur (file not found, unsupported file type). In order to localize it, change the three message variables defined in the first lines.
+`uvgrep` uses English or German error messages for the three problems that can occur (file not found, unsupported file type, invalid option). In order to add further languages, add a code block that checks LANG and sets the three message variables accordingly.
 
 #### Example
 
